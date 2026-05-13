@@ -46,7 +46,11 @@ export const SERVER_PORT = 8000;
 
 ### Step 3: Install dependecies
 
-Run `npm install` in this directory
+Run 
+
+``` run.sh
+npm install
+```
 
 ### Step 4: Running the Server
 
