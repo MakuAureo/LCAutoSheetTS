@@ -7,8 +7,8 @@ Typescript Node server that auto-fills a designed Spreadsheet.
 ### Pre-requisites
 
 To run this you'll need:
-- Node and Npm
-- A Google Sheets API OAuth setup:
+- [Node and Npm](https://nodejs.org/en/download/current)
+- A [Google Sheets API OAuth](https://console.cloud.google.com) setup:
 - - Allow `http://localhost:8000` origin
 - - Redirect to `http://localhost:8000/oauth/callback`
 - A [Spreadsheet with compatible layout](https://docs.google.com/spreadsheets/d/1HVi8b4Wckp96t3JdCr55800SIIptt3KYTdWw7_GzMHI)
