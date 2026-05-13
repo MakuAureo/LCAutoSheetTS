@@ -1,0 +1,21 @@
+{
+  "name": "nodelcas",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "node index.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "child_process": "^1.0.2",
+    "eventsource": "^4.1.0",
+    "express": "^5.2.1",
+    "googleapis": "^171.4.0",
+    "type": "^2.7.3"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.6.2",
+    "typescript": "^6.0.3"
+  }
+}
