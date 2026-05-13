@@ -1,6 +1,6 @@
 // App config
-export const CLIENT_ID     = "YOUR_API_KEY";
-export const CLIENT_SECRET = "YOUR_CLIENT_SECRET";
+export const CLIENT_ID            = "YOUR_API_KEY";
+export const CLIENT_SECRET        = "YOUR_CLIENT_SECRET";
 export const SPREADSHEET_ID       = "YOUR_SHEET_ID";
 export const ACTIVE_SHEET_NAME    = "YOUR_SHEET_NAME";
 
