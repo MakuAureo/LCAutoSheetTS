@@ -114,7 +114,7 @@ function connectToMod(): void {
         console.error("Failed to write to spreadsheet:", err);
       }
     } else {
-      console.warn("Not authenticated — skipping spreadsheet write. Visit http://localhost:${SERVER_PORT}/oauth/login");
+      console.warn(`Not authenticated — skipping spreadsheet write. Visit http://localhost:${SERVER_PORT}/oauth/login`);
     }
 
     // Reconnect for the next match
