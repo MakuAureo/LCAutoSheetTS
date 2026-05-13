@@ -3,7 +3,7 @@ import fs from "fs";
 import {
   CLIENT_ID, CLIENT_SECRET, SERVER_PORT,
   SPREADSHEET_ID, ACTIVE_SHEET_NAME,
-  START_COLUMN, QUOTA_COLUMN, SELL_COLUMN,
+  START_STATS_COLUMN, QUOTA_COLUMN, SELL_COLUMN,
   START_PLAYERS_COLUMN, PLAYER_NAME_COLUMN
 } from "./config.ts";
 
@@ -104,7 +104,7 @@ interface PlayerInfo {
 }
 
 interface SpecialItemInfo {
-  Total: number[];
+  Available: number[];
   Collected: number[];
 }
 
@@ -178,13 +178,13 @@ function processStats(stats: Stats): unknown[] {
     stats.DungeonInfo.ItemCount,
     stats.MissedItems.reduce((acc, cur) => (cur.CollectedOnPreviousDay) ? acc : acc + 1, 0),
     stats.AppSpawned,
-    stats.BeeInfo.Total.length,
-    stats.BeeInfo.Total.reduce((acc, cur) => acc + cur, 0),
-    stats.EggInfo.Total.reduce((acc, cur) => acc + cur, 0),
+    stats.BeeInfo.Available.length,
+    stats.BeeInfo.Available.reduce((acc, cur) => acc + cur, 0),
+    stats.EggInfo.Available.reduce((acc, cur) => acc + cur, 0),
     stats.IndoorSpawns.filter(e => e.Enemy === "Nutcracker").length,
     stats.IndoorSpawns.filter(e => e.Enemy === "Butler").length,
-    stats.ShotgunInfo.Total.length,
-    stats.KnifeInfo.Total.length,
+    stats.ShotgunInfo.Available.length,
+    stats.KnifeInfo.Available.length,
     stats.CollectedNoExtra,
     stats.BottomLine,
     stats.CollectedTotal,
@@ -260,8 +260,8 @@ export async function writeStats(stats: Stats): Promise<void> {
       playerStatus.push("S");
     }
     await writeCells(`${START_PLAYERS_COLUMN}${firstEmptyPlayerRow}`, [playerStatus]);
-    const firstEmptyRow = await getFirstEmptyRowInColumn(START_COLUMN);
+    const firstEmptyRow = await getFirstEmptyRowInColumn(START_STATS_COLUMN);
     const row = processStats(stats);
-    await writeCells(`${START_COLUMN}${firstEmptyRow}`, [row]);
+    await writeCells(`${START_STATS_COLUMN}${firstEmptyRow}`, [row]);
   }
 }
