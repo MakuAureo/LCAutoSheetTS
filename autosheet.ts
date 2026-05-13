@@ -114,7 +114,9 @@ interface EnemyInfo {
   TimeOfDeath: string;
 }
 
-interface Stats {
+export interface Stats {
+  Version: number;
+  
   MoonInfo: { Name: string; Weather: string };
   DungeonInfo: { Interior: string; ItemCount: number };
   HazardInfo: { TurretCount: number; LandmineCount: number; SpiketrapCount: number };
