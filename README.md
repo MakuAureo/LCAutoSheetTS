@@ -11,7 +11,7 @@ To run this you'll need:
 - A Google Sheets API OAuth setup:
 - - Allow `http://localhost:8000` origin
 - - Redirect to `http://localhost:8000/oauth/callback`
-- A [Spreadsheet compatible layout](https://docs.google.com/spreadsheets/d/1HVi8b4Wckp96t3JdCr55800SIIptt3KYTdWw7_GzMHI)
+- A [Spreadsheet with compatible layout](https://docs.google.com/spreadsheets/d/1HVi8b4Wckp96t3JdCr55800SIIptt3KYTdWw7_GzMHI)
 
 ### Step 1: Clone the Repository
 
