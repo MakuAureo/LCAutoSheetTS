@@ -27,9 +27,9 @@ const statsDB = startDB();
 export function writeStatsToDB(stats: Stats): void {
   const runType = [ "Solo", "Duo", "Trio", "Squad" ];
 
-  const insert: StatementSync = statsDB.prepare("INSERT INTO day (type, version, seed, moon, weather, collected, available, data)");
+  const insert: StatementSync = statsDB.prepare("INSERT INTO day (type, version, seed, moon, weather, collected, available, data) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
   insert.run(
-    runType[Object.keys(stats.Players).length],
+    runType[Object.keys(stats.Players).length - 1],
     stats.Version,
     stats.Seed,
     stats.MoonInfo.Name,

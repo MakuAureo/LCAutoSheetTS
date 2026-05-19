@@ -3,3 +3,4 @@ public/bg.png
 node_modules/
 tokens.json
 config.ts
+stats.db

@@ -6,6 +6,7 @@ import {
   START_STATS_COLUMN, QUOTA_COLUMN, SELL_COLUMN,
   START_PLAYERS_COLUMN, PLAYER_NAME_COLUMN
 } from "./config.ts";
+import { writeStatsToDB } from "./database.ts";
 
 const TOKENS_PATH = "./tokens.json";
 const REDIRECT_URI = `http://localhost:${SERVER_PORT}/oauth/callback`;
@@ -132,6 +133,7 @@ export interface Stats {
   CollectedTotal: number;
   BottomLine: number;
   BottomLineTrue: number;
+  ExtraFromOldGift: number;
 
   ValueSold: number;
   NewQuota: number;
@@ -160,6 +162,7 @@ export interface Stats {
     ItemType: string;
     DespawnPosition: number[];
     CollectedOnPreviousDay: boolean;
+    ScrapInsideGiftValue: number;
   }[];
 }
 
@@ -225,6 +228,9 @@ export async function writeStats(stats: Stats): Promise<void> {
     const sellAmount = Number(sellCell.values?.[0]?.[0] ?? 0);
     writeCells(`${SELL_COLUMN}${currentSellCount + 2}`, [[stats.ValueSold + sellAmount]]);
   } else {
+    // Push to database
+    writeStatsToDB(stats);
+
     //Add player names
     const playersSorted = Object.keys(stats.Players).sort((a, b) => (BigInt(a) < BigInt(b) ? -1 : BigInt(a) > BigInt(b) ? 1 : 0));
     let firstEmptyPlayerRow = await getFirstEmptyRowInColumn(START_PLAYERS_COLUMN);
