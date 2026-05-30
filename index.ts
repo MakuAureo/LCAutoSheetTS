@@ -2,8 +2,9 @@ import express from "express";
 import type { Response } from "express";
 import { EventSource } from "eventsource";
 import { exec } from "child_process";
-import { getAuthUrl, handleOAuthCallback, isAuthenticated, writeStats } from "./autosheet.ts";
+import { getAuthUrl, getSheetId, handleOAuthCallback, isAuthenticated, writeStatsToSheet } from "./autosheet.ts";
 import { MOD_PORT, SERVER_PORT } from "./config.ts";
+import { statsDB, writeStatsToDB } from "./database.ts";
 
 function openBrowser(url: string): void {
   exec(`xdg-open "${url}"`, (err) => {
@@ -74,6 +75,27 @@ app.get("/oauth/callback", async (req, res) => {
   }
 });
 
+app.get("/stats/filters", (req, res) => {
+  const players  = (statsDB.prepare("SELECT DISTINCT players FROM day").all() as {players: number}[]).map(r => r.players);
+  const versions = (statsDB.prepare("SELECT DISTINCT version FROM day").all() as {version: number}[]).map(r => r.version);
+  const moons    = (statsDB.prepare("SELECT DISTINCT moon    FROM day").all() as {moon:    string}[]).map(r => r.moon);
+  res.json({ players, versions, moons });
+});
+
+app.get("/stats/history", (req, res) => {
+  const { players, moon, version } = req.query;
+
+  const recent = statsDB.prepare(`SELECT collected FROM day WHERE players = ${players} AND moon = ${moon} AND version = ${version} ORDER BY time DESC LIMIT 10`).all() as { collected: number }[];
+  const avg = statsDB.prepare(`SELECT AVG(collected) as avg FROM day WHERE players = ${players} AND moon = ${moon} AND version = ${version}`).get() as { avg: number };
+  const recentReversed = recent.map(r => r.collected).reverse();
+
+  res.json({
+    labels: recentReversed.map((_, i) => `${i + 1}`),
+    recent: recentReversed,
+    average: Math.round(avg.avg ?? 0)
+  });
+});
+
 // Status endpoint — useful for debugging
 app.get("/status", (req, res) => {
   res.json({
@@ -108,7 +130,7 @@ function connectToMod(): void {
     if (isAuthenticated()) {
       try {
         console.log("Writing to spreadsheet...");
-        await writeStats(stats);
+        await writeStatsToSheet(stats);
         console.log("Spreadsheet updated.");
       } catch (err) {
         console.error("Failed to write to spreadsheet:", err);
@@ -116,6 +138,9 @@ function connectToMod(): void {
     } else {
       console.warn(`Not authenticated — skipping spreadsheet write. Visit http://localhost:${SERVER_PORT}/oauth/login`);
     }
+    
+    // Push to database
+    writeStatsToDB(stats);
 
     // Reconnect for the next match
     setTimeout(connectToMod, 100);
@@ -130,8 +155,10 @@ function connectToMod(): void {
 
 // ── Start ────────────────────────────────────────────────────
 
-app.listen(SERVER_PORT, () => {
+export let SHEET_ID: number;
+app.listen(SERVER_PORT, async () => {
   console.log(`Server running at http://localhost:${SERVER_PORT}`);
+  SHEET_ID = await getSheetId();
 
   if (!isAuthenticated()) {
     const loginUrl = `http://localhost:${SERVER_PORT}/oauth/login`;

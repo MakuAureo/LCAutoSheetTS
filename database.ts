@@ -1,5 +1,5 @@
 import { DatabaseSync, StatementSync } from "node:sqlite";
-import type { Stats } from "./autosheet.ts";
+import type { Stats } from "./dataschema.ts";
 
 function startDB(): DatabaseSync {
   const db = new DatabaseSync("stats.db");
@@ -8,13 +8,16 @@ function startDB(): DatabaseSync {
           CREATE TABLE IF NOT EXISTS day (
             id        INTEGER PRIMARY KEY AUTOINCREMENT,
             time      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            type      TEXT,
+            players   INTEGER,
             version   INTEGER,
             seed      INTEGER,
             moon      TEXT,
             weather   TEXT,
+            interior  TEXT,
+            items     INTEGER,
             collected INTEGER,
             available INTEGER,
+            died      INTEGER,
             data      TEXT
           )
           `);
@@ -22,20 +25,21 @@ function startDB(): DatabaseSync {
   return db;
 }
 
-const statsDB = startDB();
+export const statsDB = startDB();
 
 export function writeStatsToDB(stats: Stats): void {
-  const runType = [ "Solo", "Duo", "Trio", "Squad" ];
-
-  const insert: StatementSync = statsDB.prepare("INSERT INTO day (type, version, seed, moon, weather, collected, available, data) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+  const insert: StatementSync = statsDB.prepare("INSERT INTO day (players, version, seed, moon, weather, interior, items, collected, available, died, data) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
   insert.run(
-    runType[Object.keys(stats.Players).length - 1],
+    Object.keys(stats.Players).length,
     stats.Version,
     stats.Seed,
     stats.MoonInfo.Name,
     stats.MoonInfo.Weather,
-    stats.CollectedTotal,
-    stats.BottomLineTrue,
+    stats.DungeonInfo.Interior,
+    stats.DungeonInfo.ItemCount,
+    stats.PerformanceInfo.CollectedTotal,
+    stats.PerformanceInfo.TotalAvailableValue,
+    ((stats.Players["76561198980273231"].Alive) ? 0 : 1),
     JSON.stringify(stats)
   );
 }

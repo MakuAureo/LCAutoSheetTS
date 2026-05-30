@@ -4,9 +4,11 @@ import {
   CLIENT_ID, CLIENT_SECRET, SERVER_PORT,
   SPREADSHEET_ID, ACTIVE_SHEET_NAME,
   START_STATS_COLUMN, QUOTA_COLUMN, SELL_COLUMN,
-  START_PLAYERS_COLUMN, PLAYER_NAME_COLUMN
+  START_PLAYERS_COLUMN, PLAYER_NAME_COLUMN,
+  VERSION_CELL
 } from "./config.ts";
-import { writeStatsToDB } from "./database.ts";
+import { SHEET_ID } from "./index.ts";
+import type { Stats } from "./dataschema.ts";
 
 const TOKENS_PATH = "./tokens.json";
 const REDIRECT_URI = `http://localhost:${SERVER_PORT}/oauth/callback`;
@@ -51,7 +53,7 @@ export function isAuthenticated(): boolean {
 
 // ── Sheets helpers ───────────────────────────────────────────
 
-async function getSheetId(): Promise<number> {
+export async function getSheetId(): Promise<number> {
   const sheets = google.sheets({ version: "v4", auth: oauth2Client });
 
   const res = await sheets.spreadsheets.get({
@@ -67,6 +69,33 @@ async function getSheetId(): Promise<number> {
     throw new Error(`Sheet "${ACTIVE_SHEET_NAME}" not found`);
 
   return sheet.properties.sheetId;
+}
+
+async function addNote(cellRange: string, note: string): Promise<void> {
+  const sheets = google.sheets({ version: "v4", auth: oauth2Client });
+
+  await sheets.spreadsheets.batchUpdate({
+    spreadsheetId: SPREADSHEET_ID,
+    requestBody: {
+      requests: [{
+        updateCells: {
+          range: {
+            sheetId: SHEET_ID,
+            startRowIndex: 0,
+            endRowIndex: 1,
+            startColumnIndex: 0,
+            endColumnIndex: 1
+          },
+          rows: [{
+            values: [{
+              note: note
+            }]
+          }],
+          fields: "note"
+        }
+      }]
+    }
+  });
 }
 
 async function getFirstEmptyRowInColumn(column: string): Promise<number> {
@@ -96,76 +125,6 @@ async function writeCells(startPos: string, values: unknown[][]): Promise<void> 
 
 // ── Stat processing ──────────────────────────────────────────
 
-interface PlayerInfo {
-  Name: string;
-  Alive: boolean;
-  Disconnected: boolean;
-  TimeOfDeath: string;
-  CauseOfDeath: string;
-}
-
-interface SpecialItemInfo {
-  Available: number[];
-  Collected: number[];
-}
-
-interface EnemyInfo {
-  Enemy: string;
-  SpawnTime: string;
-  TimeOfDeath: string;
-}
-
-export interface Stats {
-  Version: number;
-  
-  MoonInfo: { Name: string; Weather: string };
-  DungeonInfo: { Interior: string; ItemCount: number };
-  HazardInfo: { TurretCount: number; LandmineCount: number; SpiketrapCount: number };
-
-  BeeInfo: SpecialItemInfo;
-  EggInfo: SpecialItemInfo;
-  KnifeInfo: SpecialItemInfo;
-  ShotgunInfo: SpecialItemInfo;
-
-  Seed: number;
-
-  CollectedNoExtra: number;
-  CollectedTotal: number;
-  BottomLine: number;
-  BottomLineTrue: number;
-  ExtraFromOldGift: number;
-
-  ValueSold: number;
-  NewQuota: number;
-
-  AppSpawned: boolean;
-  IndoorFog: boolean;
-  TakeOffTime: string;
-  SIDType: string;
-  InfestationType: string;
-  MeteorShowerTime: string;
-
-  Players: { [key: string]: PlayerInfo };
-
-  IndoorSpawns: EnemyInfo[];
-  DayTimeSpawns: EnemyInfo[];
-  NightTimeSpawns: EnemyInfo[];
-
-  GiftBoxex: {
-    GiftValue: number;
-    ScrapValue: number;
-    Collected: boolean;
-  }[];
-
-  MissedItems: {
-    Value: number;
-    ItemType: string;
-    DespawnPosition: number[];
-    CollectedOnPreviousDay: boolean;
-    ScrapInsideGiftValue: number;
-  }[];
-}
-
 function convertTimeToNumber(time: string): number {
   const allNumbers = time.match(/\d+/g);
   const dayMod = time.match(/AM|PM/);
@@ -180,96 +139,142 @@ function processStats(stats: Stats): unknown[] {
     stats.MoonInfo.Name.replace(/\d*\s/, ""),
     stats.MoonInfo.Weather,
     stats.DungeonInfo.Interior.replace(/flow|interior/gi,""),
+    stats.EventInfo.AppSpawned,
     stats.DungeonInfo.ItemCount,
     stats.MissedItems.reduce((acc, cur) => (cur.CollectedOnPreviousDay) ? acc : acc + 1, 0),
-    stats.AppSpawned,
     stats.BeeInfo.Available.length,
     stats.BeeInfo.Available.reduce((acc, cur) => acc + cur, 0),
+    stats.BeeInfo.Collected.length,
+    stats.BeeInfo.Collected.reduce((acc, cur) => acc + cur, 0),
+    stats.EggInfo.Available.length,
     stats.EggInfo.Available.reduce((acc, cur) => acc + cur, 0),
-    stats.IndoorSpawns.filter(e => e.Enemy === "Nutcracker").length,
-    stats.IndoorSpawns.filter(e => e.Enemy === "Butler").length,
+    stats.EggInfo.Collected.length,
+    stats.EggInfo.Collected.reduce((acc, cur) => acc + cur, 0),
     stats.ShotgunInfo.Available.length,
+    stats.ShotgunInfo.Available.reduce((acc, cur) => acc + cur, 0),
+    stats.ShotgunInfo.Collected.length,
+    stats.ShotgunInfo.Collected.reduce((acc, cur) => acc + cur, 0),
     stats.KnifeInfo.Available.length,
-    stats.CollectedNoExtra,
-    stats.BottomLine,
-    stats.CollectedTotal,
-    stats.BottomLineTrue,
-    stats.TakeOffTime,
+    stats.KnifeInfo.Available.reduce((acc, cur) => acc + cur, 0),
+    stats.KnifeInfo.Collected.length,
+    stats.KnifeInfo.Collected.reduce((acc, cur) => acc + cur, 0),
+    stats.PerformanceInfo.CollectedNoExtra,
+    stats.PerformanceInfo.InitialAvailableValue,
+    stats.PerformanceInfo.CollectedTotal,
+    stats.PerformanceInfo.TotalAvailableValue,
     stats.HazardInfo.TurretCount,
     stats.HazardInfo.LandmineCount,
     stats.HazardInfo.SpiketrapCount,
-    stats.IndoorFog,
-    stats.SIDType,
-    stats.InfestationType,
-    stats.MeteorShowerTime,
+    stats.EventInfo.TakeOffTime,
+    stats.EventInfo.IndoorFog,
+    stats.EventInfo.SIDType,
+    stats.EventInfo.InfestationType,
+    stats.EventInfo.MeteorShowerTime,
     stats.MissedItems.reduce((acc, cur) => (cur.CollectedOnPreviousDay) ? acc + cur.Value : acc, 0),
   ];
 }
 
-export async function writeStats(stats: Stats): Promise<void> {
-  if (stats.NewQuota != 0) {
-    //Update new quota
-    const currentQuotaCount = await getFirstEmptyRowInColumn(QUOTA_COLUMN);
-    const sellThisQuotaCell = await readCells(`${SELL_COLUMN}${currentQuotaCount - 1}`);
-    const sellThisQuotaAmount = Number(sellThisQuotaCell.values?.[0]?.[0] ?? 0);
-    await writeCells(`${QUOTA_COLUMN}${currentQuotaCount + 2}`, [[stats.NewQuota]])
-    await writeCells(`${SELL_COLUMN}${currentQuotaCount - 1}`, [[stats.ValueSold + sellThisQuotaAmount]])
+async function writeNewQuota(stats: Stats): Promise<void> {
+  const currentQuotaRow = await getFirstEmptyRowInColumn(QUOTA_COLUMN) - 1;
+  const nextQuotaRow = currentQuotaRow + 3;
+
+  const alreadySoldThisQuotaVRange = await readCells(`${SELL_COLUMN}${currentQuotaRow}`);
+  const alreadySoldThisQuotaNumber = Number(alreadySoldThisQuotaVRange.values?.[0]?.[0] ?? 0);
+
+  await writeCells(`${QUOTA_COLUMN}${nextQuotaRow}`, [[stats.QuotaInfo.NewQuota]])
+  await writeCells(`${SELL_COLUMN}${currentQuotaRow}`, [[stats.QuotaInfo.ValueSold + alreadySoldThisQuotaNumber]])
+}
+
+async function updateSoldThisQuota(stats: Stats): Promise<void> {
+  const currentSellRow = await getFirstEmptyRowInColumn(SELL_COLUMN) - 1;
+
+  if (currentSellRow == 1) {
+    await writeCells(`${SELL_COLUMN}3`, [[stats.QuotaInfo.ValueSold]]);
+    return;
+  }
+
+  const alreadySoldThisQuotaVRange = await readCells(`${SELL_COLUMN}${currentSellRow}`);
+  const alreadySoldThisQuotaNumber = Number(alreadySoldThisQuotaVRange.values?.[0]?.[0] ?? 0);
+
+  writeCells(`${SELL_COLUMN}${currentSellRow}`, [[stats.QuotaInfo.ValueSold + alreadySoldThisQuotaNumber]]);
+}
+
+async function writeInitalValues(stats: Stats, playersSorted: string[]): Promise<void> {
+  let playerInits: string[] = [];
+  let playerNames: string[][] = [];
+  for (const key of playersSorted) {
+    const value = stats.Players[key];
+    playerInits.push(value.Name.slice(0,2));
+    playerNames.push([value.Name]);
+  }
+
+  await writeCells(`${START_PLAYERS_COLUMN}1`, [ playerInits ]);
+  await writeCells(`${PLAYER_NAME_COLUMN}3`, playerNames);
+  await writeCells(VERSION_CELL, [[ stats.Version ]]);
+}
+
+async function writeNewDay(stats: Stats): Promise<void> {
+  const playersSorted: string[] = Object.keys(stats.Players).sort((a, b) => (BigInt(a) < BigInt(b) ? -1 : BigInt(a) > BigInt(b) ? 1 : 0));
+  let firstEmptyPlayerRow = await getFirstEmptyRowInColumn(START_PLAYERS_COLUMN);
+  if (firstEmptyPlayerRow == 1) {
+    writeInitalValues(stats, playersSorted);
+    firstEmptyPlayerRow = 3;
+  }
+
+  let playerStatus: string[] = [];
+  for (const key of playersSorted) {
+    const value = stats.Players[key];
+    if (value.Alive == true) {
+      playerStatus.push(value.Disconnected ? "D" : "A");
+      continue;
+    }
+
+    if (value.CauseOfDeath == "Abandoned") {
+      playerStatus.push("M");
+      continue;
+    }
+
+    if (convertTimeToNumber(value.TimeOfDeath) + 120 < convertTimeToNumber(stats.EventInfo.TakeOffTime)) {
+      playerStatus.push("X");
+      continue;
+    }
+
+    playerStatus.push("S");
+  }
+
+  const newRow = processStats(stats);
+
+  let firstEmptyRow = await getFirstEmptyRowInColumn(START_STATS_COLUMN);
+  if (firstEmptyRow < 3) firstEmptyRow = 3;
+
+  await writeCells(`${START_PLAYERS_COLUMN}${firstEmptyPlayerRow}`, [playerStatus]);
+  await writeCells(`${START_STATS_COLUMN}${firstEmptyRow}`, [newRow]);
+}
+
+async function updateShopSales(stats: Stats): Promise<void> {
+  let sales: number[][] = [];
+  const itemList = Object.keys(stats.ShopSales);
+  for (const key of itemList) {
+    const value = stats.ShopSales[key];
+    sales.push([value]);
+  }
+
+  await writeCells("AY4", sales);
+}
+
+async function updateFurnitureState(stats: Stats): Promise<void> {
+}
+
+export async function writeStatsToSheet(stats: Stats): Promise<void> {
+  await updateShopSales(stats);
+  await updateFurnitureState(stats);
+
+  if (stats.QuotaInfo.NewQuota != 0) {
+    await writeNewQuota(stats);
   } else if (stats.DungeonInfo == null) {
-    //If nothing was sold do nothing
-    if (stats.ValueSold == 0)
-      return;
-    //Update amount sold
-    const currentSellCount = await getFirstEmptyRowInColumn(SELL_COLUMN);
-    if (currentSellCount == 1) {
-      await writeCells(`${SELL_COLUMN}2`, [[stats.ValueSold]]);
-      return;
-    }
-    const sellCell = await readCells(`${SELL_COLUMN}${currentSellCount + 2}`);
-    const sellAmount = Number(sellCell.values?.[0]?.[0] ?? 0);
-    writeCells(`${SELL_COLUMN}${currentSellCount + 2}`, [[stats.ValueSold + sellAmount]]);
+    if (stats.QuotaInfo.ValueSold == 0) return;
+    await updateSoldThisQuota(stats);
   } else {
-    // Push to database
-    writeStatsToDB(stats);
-
-    //Add player names
-    const playersSorted = Object.keys(stats.Players).sort((a, b) => (BigInt(a) < BigInt(b) ? -1 : BigInt(a) > BigInt(b) ? 1 : 0));
-    let firstEmptyPlayerRow = await getFirstEmptyRowInColumn(START_PLAYERS_COLUMN);
-    if (firstEmptyPlayerRow == 1) {
-      let playerInits: string[] = [];
-      let playerNames: string[][] = [];
-      for (const key of playersSorted) {
-        const value = stats.Players[key];
-        playerInits.push(value.Name.slice(0,2));
-        playerNames.push([value.Name]);
-      }
-      await writeCells(`${START_PLAYERS_COLUMN}${firstEmptyPlayerRow}`, [ playerInits ]);
-      await writeCells(`${PLAYER_NAME_COLUMN}2`, playerNames);
-      firstEmptyPlayerRow++;
-    }
-    //Add player status
-    let playerStatus: string[] = [];
-    for (const key of playersSorted) {
-      const value = stats.Players[key];
-      if (value.Alive == true) {
-        playerStatus.push(value.Disconnected ? "D" : "A");
-        continue;
-      }
-
-      if (value.CauseOfDeath == "Abandoned") {
-        playerStatus.push("M");
-        continue;
-      }
-
-      if (convertTimeToNumber(value.TimeOfDeath) + 120 < convertTimeToNumber(stats.TakeOffTime)) {
-        playerStatus.push("X");
-        continue;
-      }
-
-      playerStatus.push("S");
-    }
-    await writeCells(`${START_PLAYERS_COLUMN}${firstEmptyPlayerRow}`, [playerStatus]);
-    const firstEmptyRow = await getFirstEmptyRowInColumn(START_STATS_COLUMN);
-    const row = processStats(stats);
-    await writeCells(`${START_STATS_COLUMN}${firstEmptyRow}`, [row]);
+    await writeNewDay(stats);
   }
 }

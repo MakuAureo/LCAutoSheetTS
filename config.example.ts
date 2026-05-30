@@ -7,9 +7,9 @@ export const ACTIVE_SHEET_NAME    = "YOUR_SHEET_NAME";
 // In sheet config
 export const QUOTA_COLUMN         = "B";
 export const START_STATS_COLUMN   = "D";
-export const SELL_COLUMN          = "AE";
-export const START_PLAYERS_COLUMN = "AF";
-export const PLAYER_NAME_COLUMN   = "AJ";
+export const SELL_COLUMN          = "AP";
+export const START_PLAYERS_COLUMN = "AQ";
+export const PLAYER_NAME_COLUMN   = "AU";
 
 // Port config
 export const MOD_PORT    = 2145;
