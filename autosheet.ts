@@ -242,13 +242,13 @@ async function writeNewDay(stats: Stats): Promise<void> {
     playerStatus.push("S");
   }
 
-  const newRow = processStats(stats);
-
-  let firstEmptyRow = await getFirstEmptyRowInColumn(START_STATS_COLUMN);
-  if (firstEmptyRow < 3) firstEmptyRow = 3;
-
   await writeCells(`${START_PLAYERS_COLUMN}${firstEmptyPlayerRow}`, [playerStatus]);
-  await writeCells(`${START_STATS_COLUMN}${firstEmptyRow}`, [newRow]);
+
+  let nextEmptyRow = await getFirstEmptyRowInColumn(START_STATS_COLUMN);
+  if (nextEmptyRow < 3) nextEmptyRow = 3;
+
+  const newRow = processStats(stats);
+  await writeCells(`${START_STATS_COLUMN}${nextEmptyRow}`, [newRow]);
 }
 
 async function updateShopSales(stats: Stats): Promise<void> {
