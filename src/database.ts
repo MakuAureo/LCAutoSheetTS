@@ -28,6 +28,17 @@ function startDB(): DatabaseSync {
 export const statsDB = startDB();
 
 export function writeStatsToDB(stats: Stats): void {
+  if (stats.DungeonInfo == null)
+    return;
+
+  const players = Object.keys(stats.Players);
+  let deaths = 0;
+  for (const key of players) {
+    const value = stats.Players[key];
+    if (!value.Alive) deaths++;
+  }
+  if (deaths == players.length) return;
+
   const insert: StatementSync = statsDB.prepare("INSERT INTO day (players, version, seed, moon, weather, interior, items, collected, available, died, data) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
   insert.run(
     Object.keys(stats.Players).length,

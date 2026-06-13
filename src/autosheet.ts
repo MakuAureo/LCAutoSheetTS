@@ -5,9 +5,8 @@ import {
   SPREADSHEET_ID, ACTIVE_SHEET_NAME,
   START_STATS_COLUMN, QUOTA_COLUMN, SELL_COLUMN,
   START_PLAYERS_COLUMN, PLAYER_NAME_COLUMN,
-  VERSION_CELL
+  VERSION_CELL, SALE_CELL, FURNITURE_CELL_START
 } from "./config.ts";
-import { SHEET_ID } from "./index.ts";
 import type { Stats } from "./dataschema.ts";
 
 const TOKENS_PATH = "./tokens.json";
@@ -259,13 +258,23 @@ async function updateShopSales(stats: Stats): Promise<void> {
     sales.push([value]);
   }
 
-  await writeCells("AY4", sales);
+  await writeCells(SALE_CELL, sales);
 }
 
 async function updateFurnitureState(stats: Stats): Promise<void> {
+  let furniture: any[][] = [];
+  const furnList = Object.keys(stats.FurnitureInfo);
+  for (const key of furnList) {
+    const value = stats.FurnitureInfo[key];
+    furniture.push([ key, value.Luck, value.RealPrice, value.Owned && !value.Stored, value.InStock ]);
+  }
+
+  await writeCells(FURNITURE_CELL_START, furniture);
 }
 
+let SHEET_ID: number;
 export async function writeStatsToSheet(stats: Stats): Promise<void> {
+  SHEET_ID = await getSheetId();
   await updateShopSales(stats);
   await updateFurnitureState(stats);
 

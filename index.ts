@@ -2,9 +2,9 @@ import express from "express";
 import type { Response } from "express";
 import { EventSource } from "eventsource";
 import { exec } from "child_process";
-import { getAuthUrl, getSheetId, handleOAuthCallback, isAuthenticated, writeStatsToSheet } from "./autosheet.ts";
-import { MOD_PORT, SERVER_PORT } from "./config.ts";
-import { statsDB, writeStatsToDB } from "./database.ts";
+import { getAuthUrl, getSheetId, handleOAuthCallback, isAuthenticated, writeStatsToSheet } from "./src/autosheet.ts";
+import { MOD_PORT, SERVER_PORT } from "./src/config.ts";
+import { statsDB, writeStatsToDB } from "./src/database.ts";
 
 function openBrowser(url: string): void {
   exec(`xdg-open "${url}"`, (err) => {
@@ -155,10 +155,8 @@ function connectToMod(): void {
 
 // ── Start ────────────────────────────────────────────────────
 
-export let SHEET_ID: number;
 app.listen(SERVER_PORT, async () => {
   console.log(`Server running at http://localhost:${SERVER_PORT}`);
-  SHEET_ID = await getSheetId();
 
   if (!isAuthenticated()) {
     const loginUrl = `http://localhost:${SERVER_PORT}/oauth/login`;

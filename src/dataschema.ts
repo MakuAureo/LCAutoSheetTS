@@ -58,6 +58,7 @@ interface SpawnInfo {
 interface FurnitureInfo {
   InStock: boolean;
   Owned: boolean;
+  Stored: boolean;
   ApparentPrice: number;
   RealPrice: number;
   Luck: number;

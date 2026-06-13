@@ -8,11 +8,9 @@ export const START_STATS_COLUMN       = "D";
 export const SELL_COLUMN              = "AP";
 export const START_PLAYERS_COLUMN     = "AQ";
 export const PLAYER_NAME_COLUMN       = "AU";
-export const VERSION_CELL             = "BT5";
-export const SALE_COLUMN              = "AY"
-export const FURNITURE_LUCK_COLUMN    = "AY"
-export const FURNITURE_PRICE_COLUMN   = "AY"
-export const FURNITURE_PLACED_COLUMN  = "AY"
+export const VERSION_CELL             = "BU5";
+export const SALE_CELL                = "AY4"
+export const FURNITURE_CELL_START     = "BE4"
 
 export const MOD_PORT    = 2145;
 export const SERVER_PORT = 8000;
