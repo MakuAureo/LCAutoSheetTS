@@ -3,6 +3,8 @@ export const CLIENT_SECRET        = "YOUR_CLIENT_SECRET";
 export const SPREADSHEET_ID       = "YOUR_SHEET_ID";
 export const ACTIVE_SHEET_NAME    = "YOUR_SHEET_NAME"; // By default "CurrentRun"
 
+export const PLAYER_STEAM_ID = "YOUR_STEAM_ID";
+
 export const QUOTA_COLUMN             = "B";
 export const START_STATS_COLUMN       = "D";
 export const SELL_COLUMN              = "AP";

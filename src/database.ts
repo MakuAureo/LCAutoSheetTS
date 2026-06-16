@@ -1,4 +1,5 @@
 import { DatabaseSync, StatementSync } from "node:sqlite";
+import { PLAYER_STEAM_ID } from "./config.ts"; 
 import type { Stats } from "./dataschema.ts";
 
 function startDB(): DatabaseSync {
@@ -50,7 +51,7 @@ export function writeStatsToDB(stats: Stats): void {
     stats.DungeonInfo.ItemCount,
     stats.PerformanceInfo.CollectedTotal,
     stats.PerformanceInfo.TotalAvailableValue,
-    ((stats.Players["76561198980273231"].Alive) ? 0 : 1),
+    ((stats.Players[PLAYER_STEAM_ID].Alive) ? 0 : 1),
     JSON.stringify(stats)
   );
 }
