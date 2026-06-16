@@ -26,19 +26,25 @@ or download the repository
 Rename `config.example.ts` to `config.ts` and fill in the necessary fields
 
 #### Config File
-``` config.js
+``` config.ts
 // App config
-export const CLIENT_ID            = "PUT_YOUR_API_KEY";
-export const CLIENT_SECRET        = "PUT_YOUR_CLIENT_SECRET";
-export const SPREADSHEET_ID       = "PUT_YOUR_SHEET_ID";
-export const ACTIVE_SHEET_NAME    = "PUT_YOUR_SHEET_NAME";
+export const CLIENT_ID            = "YOUR_API_KEY";
+export const CLIENT_SECRET        = "YOUR_CLIENT_SECRET";
+export const SPREADSHEET_ID       = "YOUR_SHEET_ID";
+export const ACTIVE_SHEET_NAME    = "YOUR_SHEET_NAME"; // By default "CurrentRun"
+
+// Database config
+export const PLAYER_STEAM_ID = "YOUR_STEAM_ID";
 
 // In sheet config
-export const QUOTA_COLUMN         = "B";
-export const START_STATS_COLUMN   = "D";
-export const SELL_COLUMN          = "AE";
-export const START_PLAYERS_COLUMN = "AF";
-export const PLAYER_NAME_COLUMN   = "AJ";
+export const QUOTA_COLUMN             = "B";
+export const START_STATS_COLUMN       = "D";
+export const SELL_COLUMN              = "AP";
+export const START_PLAYERS_COLUMN     = "AQ";
+export const PLAYER_NAME_COLUMN       = "AU";
+export const VERSION_CELL             = "BU5";
+export const SALE_CELL                = "AY4"
+export const FURNITURE_CELL_START     = "BE4"
 
 // Port config
 export const MOD_PORT    = 2145;
