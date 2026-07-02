@@ -36,6 +36,7 @@ app.get("/live", (req, res) => {
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache");
   res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Connection", "keep-alive");
   res.flushHeaders();
 
   browserClients.add(res);
@@ -129,9 +130,7 @@ function connectToMod(): void {
     // Write to sheets if authenticated
     if (isAuthenticated()) {
       try {
-        console.log("Writing to spreadsheet...");
         await writeStatsToSheet(stats);
-        console.log("Spreadsheet updated.");
       } catch (err) {
         console.error("Failed to write to spreadsheet:", err);
       }

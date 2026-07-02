@@ -3,429 +3,102 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stat Tracker</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
-
-* { margin: 0; padding: 0; box-sizing: border-box; }
-
-body {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Share Tech Mono', monospace;
-  background: #111 url('bg.png') center/cover no-repeat;
-}
-
-  .card {
-    background: rgba(0, 0, 0, 0.65);
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 12px;
-    padding: 28px;
-    width: min(1400px, 95vw);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-    backdrop-filter: blur(4px);
-  }
-
-  .boxes {
-    width: 100%;
-    display: flex;
-    gap: 16px;
-  }
-
-  #status {
-    font-size: 14px;
-    color: rgba(255,255,255,0.35);
-    letter-spacing: 0.05em;
-    min-height: 16px;
-  }
-
-  #status.error { color: #f87171; }
-
-  #status.success { color: #45de16; }
-
-  #json-box {
-    flex: 1;
-    height: 850px;
-    overflow-y: auto;
-    background: rgba(0,0,0,0.4);
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 8px;
-    padding: 16px 20px;
-  }
-
-  #json-box::-webkit-scrollbar { width: 6px; }
-  #json-box::-webkit-scrollbar-track { background: transparent; }
-  #json-box::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 3px; }
-
-  #json-content {
-    font-size: 14px;
-    line-height: 1.7;
-    color: rgba(255,255,255,0.85);
-    white-space: pre;
-  }
-
-  #json-content.placeholder {
-    color: rgba(255,255,255,0.25);
-    font-style: italic;
-    white-space: normal;
-  }
-
-  .chart-column {
-    flex: 1;
-    height: 850px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  #chart-top-box {
-    min-height: 0;
-    position: relative;
-    flex: 1;
-    background: rgba(0,0,0,0.4);
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 8px;
-    padding: 16px 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    height: 450px;
-  }
-
-  #chart-top-controls {
-    display: flex;
-    gap: 8px;
-  }
-
-  #chart-top-controls select {
-    flex: 1;
-    background: rgba(0,0,0,0.4);
-    border: 1px solid rgba(255,255,255,0.2);
-    color: rgba(255,255,255,0.7);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 12px;
-    padding: 4px 8px;
-    border-radius: 4px;
-    outline: none;
-    cursor: pointer;
-  }
-
-  #chart-top-controls select:focus {
-    border-color: rgba(255,255,255,0.5);
-  }
-
-  .filter-group {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  .filter-label {
-    font-size: 12px;
-    color: rgba(255,255,255,0.35);
-    letter-spacing: 0.08em;
-  }
-
-  #chart-box {
-    min-height: 0;
-    position: relative;
-    flex: 1;
-    background: rgba(0,0,0,0.4);
-    border: 1px solid rgba(255,255,255,0.12);
-    border-radius: 8px;
-    padding: 16px 20px;
-    display: flex;
-    flex-direction: column;
-    height: 400px;
-  }
-
-  #chart-refresh {
-    position: absolute;
-    top: 10px;
-    right: 12px;
-    background: transparent;
-    border: 1px solid rgba(255,255,255,0.2);
-    color: rgba(255,255,255,0.4);
-    font-size: 14px;
-    width: 26px;
-    height: 26px;
-    border-radius: 4px;
-    cursor: pointer;
-    line-height: 1;
-    transition: all 0.2s;
-  }
-
-  #chart-refresh:hover {
-    border-color: rgba(255,255,255,0.6);
-    color: rgba(255,255,255,0.8);
-  }
-
-  .chart-wrapper {
-    position: relative;
-    flex: 1;
-    min-height: 0;
-  }
-
-  .jk { color: #79c0ff; }
-  .js { color: #a5d6ff; }
-  .jn { color: #4ade80; }
-  .jb { color: #f87171; }
-  .jz { color: #8b949e; }
-    </style>
+    <title>Terminal</title>
+    <link rel="stylesheet" href="style.css"/>
+    <script src="script.js" defer></script>
   </head>
+
   <body>
-    <div class="card">
-      <span id="status">Awaiting for connection response...</span>
-      <div class="boxes">
-        <div id="json-box">
-          <div id="json-content" class="placeholder">No data yet — waiting for day to end.</div>
+    <div class="img-overlay"></div>
+
+    <div class="crt-screen">
+      <div class="crt-content">
+        <input class="tab-input" type="radio" name="tabs" id="tab1" checked>
+        <input class="tab-input" type="radio" name="tabs" id="tab2">
+        <input class="tab-input" type="radio" name="tabs" id="tab3">
+        <input class="tab-input" type="radio" name="tabs" id="tab4">
+
+        <nav class="tab-nav">
+          <label class="tab-label glow" for="tab1">[ LAST DAY ]</label>
+          <label class="tab-label glow" for="tab2">[ STATS⚠️ ]</label>
+          <label class="tab-label glow" for="tab3">[ MAP⚠️ ]</label>
+          <label class="tab-label glow" for="tab4">[ CREDITS ]</label>
+        </nav>
+
+        <div class="tab-content">
+          <div id="panel1" class="tab-panel">
+            <div class="panel-title glow">INFO ABOUT LAST DAY</div>
+
+            <div class="info-boxes">
+              <div id="day-content" class="info-box">
+                <h2>Moon Info</h2>
+                <div id="moon-info" class="hide-item">
+                  <h3><span id="weather"></span> <span id="moon-name"></span></h3>
+                  <h4>Seed: <span id="seed"></span></h4>
+                  <p>Interior: <span id="interior"></span></p>
+                  <p>Items: <span id="items"></span></p>
+                  <h4>Spawns</h4>
+                  <p>Bees: <span id="bees-collected"></span>/<span id="bees-available"></span> -- $<span id="bees-collected-value"></span>/$<span id="bees-available-value"></span></p>
+                  <p>Kiwi Eggs: <span id="eggs-collected"></span>/<span id="eggs-available"></span> -- $<span id="eggs-collected-value"></span>/$<span id="eggs-available-value"></span></p>
+                  <p>Nutcrackers: <span id="nuts-collected"></span>/<span id="nuts-available"></span> -- $<span id="nuts-collected-value"></span>/$<span id="nuts-available-value"></span></p>
+                  <p>Butlers: <span id="buts-collected"></span>/<span id="buts-available"></span> -- $<span id="buts-collected-value"></span>/$<span id="buts-available-value"></span></p>
+                  <h4>Collected</h4>
+                  <p>Scrap Value Collected: <span id="scrap-value-collected"></span></p>
+                  <p>Scrap Value Available: <span id="scrap-value-available"></span></p>
+                  <p>Total Collected: <span id="total-collected"></span></p>
+                  <p>Total Available: <span id="total-available"></span></p>
+                  <h4>Missed</h4>
+                  <p>Missed Items: <span id="missed"></span></p>
+                  <p>Lost Scrap: $<span id="lost-scrap"></span></p>
+                </div>
+              </div>
+
+              <div id="player-content" class="info-box">
+                <h2>Player Info</h2>
+                <ul>
+                </ul>
+              </div>
+
+              <div id="json-box" class="info-box">
+                <button class="glow" onclick="downloadJSON()">Save JSON</button>
+                <div id="json-content">{ }</div>
+              </div>
+            </div>
+          </div>
+
+          <div id="panel2" class="tab-panel">
+            <div class="panel-title glow">STATS INFO (WIP⚠️)</div>
+
+            <div class="info-boxes">
+              <div id="charts" class="info-box">
+              </div>
+            </div>
+          </div>
+
+          <div id="panel3" class="tab-panel">
+            <div class="panel-title glow">MAP (WIP⚠️)</div>
+              <p>nothing to see here. Yet...</p>
+          </div>
+
+          <div id="panel4" class="tab-panel">
+            <div class="panel-title glow">CREDITS</div>
+            <h2>Site Credits</h2>
+            <p>Copyright (c) 2026 MakuAu</p>
+            <h2>Font Credits</h2>
+            <p>Copyright (c) 2011-2022, Ricardo Banffy.</p>
+            <p>Copyright (c) 1993-2011, Paul Mattes.</p>
+            <p>Copyright (c) 2004-2005, Don Russell.</p>
+            <p>Copyright (c) 2004, Dick Altenbern.</p>
+            <p>Copyright (c) 1990, Jeff Sparkes.</p>
+            <p>Copyright (c) 1989, Georgia Tech Research Corporation (GTRC), Atlanta, GA 30332.</p>
+            <p>All rights reserved.</p>
+          </div>
         </div>
-        <div class="chart-column">
-          <div id="chart-top-box">
-            <div id="chart-top-controls">
-              <div class="filter-group">
-                <span class="filter-label">Player Count</span>
-                <select id="filter-players" onchange="refreshTopChart()"></select>
-              </div>
-              <div class="filter-group">
-                <span class="filter-label">Version</span>
-                <select id="filter-version" onchange="refreshTopChart()"></select>
-              </div>
-              <div class="filter-group">
-                <span class="filter-label">Moon</span>
-                <select id="filter-moon" onchange="refreshTopChart()"></select>
-              </div>
-            </div>
-            <div class="chart-wrapper">
-              <canvas id="top-chart"></canvas>
-            </div>
-          </div>
-          <div id="chart-box">
-            <button id="chart-refresh" onclick="refreshBottomChart()">↻</button>
-            <div class="chart-wrapper">
-              <canvas id="collected-chart"></canvas>
-            </div>
-          </div>
+
+        <div class="cursor-bar glow">
+          <p class="no-style">&gt <span class="cursor glow"></span></p>
         </div>
       </div>
     </div>
-
-    <script>
-      let es = null;
-      let lastStats = null;
-
-      // ── Chart setup ──────────────────────────────────────────
-
-      Chart.defaults.font.family = "Share Tech Mono";
-      Chart.defaults.font.size = 14;
-      const chart = new Chart(document.getElementById("collected-chart"), {
-        type: "line",
-        data: {
-          labels: [],
-          datasets: [
-            {
-              label: "Last 10 days played",
-              data: [],
-              borderColor: "#4ade80",
-              backgroundColor: "rgba(74,222,128,0.1)",
-              cubicInterpolationMode: 'monotone',
-              tension: 0.3,
-              fill: true
-            },
-            {
-              label: "Life-Time Average",
-              data: [],
-              borderColor: "rgba(255,255,255,0.4)",
-              borderDash: [6, 4],
-              pointRadius: 0,
-              fill: false
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              display: false,
-              labels: { color: "rgba(255,255,255,0.5)", font: { family: "Share Tech Mono" } }
-            }
-          },
-          scales: {
-            x: {
-              ticks: { color: "rgba(255,255,255,0.4)" }
-            },
-            y: {
-              suggestedMin: 1000,
-              suggestedMax: 2000,
-              ticks: { color: "rgba(255,255,255,0.4)" }
-            }
-          }
-        }
-      });
-
-      const topChart = new Chart(document.getElementById("top-chart"), {
-        type: "line",
-        data: {
-          labels: [],
-          datasets: [
-            {
-              label: "Last 10 days",
-              data: [],
-              borderColor: "#79c0ff",
-              backgroundColor: "rgba(121,192,255,0.1)",
-              cubicInterpolationMode: 'monotone',
-              tension: 0.3,
-              fill: true
-            },
-            {
-              label: "Life-Time Average",
-              data: [],
-              borderColor: "rgba(255,255,255,0.4)",
-              borderDash: [6, 4],
-              pointRadius: 0,
-              fill: false
-            }
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              display: false,
-              labels: { color: "rgba(255,255,255,0.5)", font: { family: "Share Tech Mono" } }
-            }
-          },
-          scales: {
-            x: {
-              ticks: { color: "rgba(255,255,255,0.4)" }
-            },
-            y: {
-              suggestedMin: 1000,
-              suggestedMax: 2000,
-              ticks: { color: "rgba(255,255,255,0.4)" }
-            }
-          }
-        }
-      });
-
-      async function loadFilters() {
-        const res = await fetch("/stats/filters");
-        const { players, versions, moons } = await res.json();
-
-        const prev = {
-          players: document.getElementById("filter-players").value,
-          version: document.getElementById("filter-version").value,
-          moon:    document.getElementById("filter-moon").value,
-        };
-
-        populate("filter-players", players);
-        populate("filter-version", versions);
-        populate("filter-moon",    moons);
-
-        // Restore previous selections if they still exist in the new options
-        if (prev.players) document.getElementById("filter-players").value = prev.players;
-        if (prev.version) document.getElementById("filter-version").value = prev.version;
-        if (prev.moon)    document.getElementById("filter-moon").value    = prev.moon;
-
-        await refreshTopChart();
-      }
-
-      function populate(id, values) {
-        const el = document.getElementById(id);
-        el.innerHTML = values.map(v => `<option value="${v}">${v}</option>`).join("");
-      }
-
-      async function refreshTopChart() {
-        const players = document.getElementById("filter-players").value;
-        const version = document.getElementById("filter-version").value;
-        const moon    = document.getElementById("filter-moon").value;
-        if (!players || !version || !moon) return;
-
-        const res = await fetch(`/stats/history?players=${players}&moon='${moon}'&version=${version}`);
-        const { labels, recent, average } = await res.json();
-
-        topChart.data.labels           = labels;
-        topChart.data.datasets[0].data = recent;
-        topChart.data.datasets[1].data = new Array(labels.length).fill(average);
-        topChart.update();
-      }
-
-      function updateBottomChart(labels, recent, average) {
-        chart.data.labels                  = labels;
-        chart.data.datasets[0].data        = recent;
-        chart.data.datasets[1].data        = new Array(labels.length).fill(average);
-        chart.update();
-      }
-
-      async function refreshBottomChart() {
-        if (!lastStats) return;
-        const res = await fetch(`/stats/history?players=${Object.keys(lastStats.Players).length}&moon='${lastStats.MoonInfo.Name}'&version=${lastStats.Version}`);
-        const { labels, recent, average } = await res.json();
-        updateBottomChart(labels, recent, average);
-      }
-
-      // ── JSON display ─────────────────────────────────────────
-
-      function highlight(obj) {
-        const json = JSON.stringify(obj, null, 2);
-        return json.replace(
-          /("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(?:\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
-          (m) => {
-            if (/^"/.test(m) && /:$/.test(m)) return `<span class="jk">${m}</span>`;
-              if (/^"/.test(m))                 return `<span class="js">${m}</span>`;
-                if (/true|false/.test(m))         return `<span class="jb">${m}</span>`;
-                if (/null/.test(m))               return `<span class="jz">${m}</span>`;
-                return `<span class="jn">${m}</span>`;
-              }
-              );
-      }
-
-      function showJson(obj) {
-        const el = document.getElementById("json-content");
-        el.classList.remove("placeholder");
-        el.innerHTML = highlight(obj);
-      }
-
-      function setStatus(text, success, error) {
-        const el = document.getElementById("status");
-        el.textContent = text;
-        el.className = error ? "error" : "";
-        el.className = success ? "success" : el.className;
-      }
-
-
-      // ── SSE ──────────────────────────────────────────────────
-
-      function connect() {
-        if (es) { es.close(); es = null; }
-
-        es = new EventSource("/live");
-        es.onmessage = async (e) => {
-          lastStats = JSON.parse(e.data);
-          showJson(lastStats);
-          setStatus("Last updated: " + new Date().toLocaleTimeString(), true, false);
-          await refreshBottomChart();
-          await loadFilters();
-        };
-
-        es.onerror = (e) => {
-          setStatus("Connection lost. Retrying...", false, true);
-          es.close();
-          setTimeout(connect, 3000);
-        };
-      }
-
-      loadFilters();
-      connect();
-    </script>
   </body>
 </html>

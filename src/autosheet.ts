@@ -274,6 +274,7 @@ async function updateFurnitureState(stats: Stats): Promise<void> {
 
 let SHEET_ID: number;
 export async function writeStatsToSheet(stats: Stats): Promise<void> {
+  console.log("Writing to spreadsheet...");
   SHEET_ID = await getSheetId();
   await updateShopSales(stats);
   await updateFurnitureState(stats);
@@ -286,4 +287,5 @@ export async function writeStatsToSheet(stats: Stats): Promise<void> {
   } else {
     await writeNewDay(stats);
   }
+  console.log("Spreadsheet updated.");
 }
