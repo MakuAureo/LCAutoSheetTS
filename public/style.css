@@ -283,3 +283,310 @@ p:not(.no-style) {
 .hide-item {
   display: none;
 }
+
+#map-layout {
+  display: flex;
+  flex: 1;
+  gap: 12px;
+  min-height: 0;
+}
+
+#map-panel {
+  flex: 0 0 220px;
+  overflow-y: auto;
+  background: #00000060;
+  border: 2px solid var(--green-dim);
+}
+
+#map-panel h2 {
+  font-size: 18px;
+  overflow-wrap: anywhere;
+}
+
+#map-panel h4 {
+  margin-top: 12px;
+}
+
+#map-panel button {
+  padding: 4px 10px;
+  font-family: '3270', 'Courier New', monospace;
+  font-size: 15px;
+  background: #00000040;
+  border: 2px solid var(--green-dim);
+  border-radius: 6px;
+  color: var(--green);
+  cursor: pointer;
+}
+
+#map-panel button:hover {
+  border-color: var(--green);
+}
+
+#map-panel button.selected {
+  background: #33ff3322;
+  border-color: var(--green);
+}
+
+#map-floors {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+#map-zoom, #map-goto, #map-rotation {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+#map-goto button {
+  flex: 1;
+}
+
+#map-toggles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+#map-toggles button {
+  padding: 4px 2px;
+  font-size: 13px;
+}
+
+#map-toggles .swatch {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-right: 4px;
+}
+
+#map-toggles .swatch.missed {
+  background: #ffe600;
+}
+
+#map-toggles .swatch.spawned {
+  background: #b45cff;
+}
+
+#map-toggles .swatch.enemy-spawn {
+  background: #ff2a2a;
+}
+
+#map-toggles .swatch.enemy-end {
+  background: #7a0000;
+}
+
+#map-items.hide-missed .map-item:not(.highlighted),
+#map-items.hide-spawned .map-spawned-item:not(.highlighted),
+#map-items.hide-enemy-spawn .map-enemy-spawn:not(.highlighted),
+#map-items.hide-enemy-end .map-enemy-end:not(.highlighted) {
+  display: none;
+}
+
+.map-item.highlighted, .map-spawned-item.highlighted, .map-enemy-spawn.highlighted, .map-enemy-end.highlighted {
+  z-index: 1;
+  outline: 2px solid #fff;
+  animation: map-item-highlight 1s ease-in-out infinite;
+}
+
+@keyframes map-item-highlight {
+  50% { outline-color: transparent; box-shadow: 0 0 10px 4px #ffffffaa; }
+}
+
+#map-panel button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+#map-rotation-level {
+  min-width: 40px;
+  text-align: center;
+}
+
+#map-zoom-level {
+  min-width: 48px;
+  text-align: center;
+}
+
+#map-download, #map-upload {
+  width: 100%;
+  margin-top: 20px;
+}
+
+#map-download + #map-upload, #map-controls:not(.hide-item) + #map-upload {
+  margin-top: 8px;
+}
+
+#map-view {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  cursor: grab;
+  touch-action: none;
+}
+
+#map-view.dragging {
+  cursor: grabbing;
+}
+
+#map-stage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
+}
+
+#map-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  user-select: none;
+}
+
+.map-item, .map-spawned-item, .map-enemy-spawn, .map-enemy-end, .map-entrance, .map-door, .map-code {
+  position: absolute;
+  transform: translate(-50%, -50%) rotate(calc(var(--map-rotation, 0deg) * -1)) scale(var(--item-scale, 1));
+  cursor: help;
+}
+
+.map-item {
+  width: 8px;
+  height: 8px;
+  background: #ffe600;
+}
+
+.map-item, .map-spawned-item, .map-enemy-spawn, .map-enemy-end {
+  cursor: pointer;
+}
+
+.map-outside-object, .map-removed-tree {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  transform: translate(-50%, -50%) rotate(calc(var(--map-rotation, 0deg) * -1)) scale(var(--item-scale, 1));
+  cursor: help;
+}
+
+.map-outside-object {
+  background: #38d6c0;
+}
+
+.map-removed-tree {
+  background: #8a8a8a;
+  border-radius: 50%;
+}
+
+#map-floors button.outside {
+  grid-column: 1 / -1;
+}
+
+.map-enemy-spawn, .map-enemy-end {
+  width: 8px;
+  height: 8px;
+}
+
+.map-enemy-spawn {
+  background: #ff2a2a;
+}
+
+.map-enemy-end {
+  background: #7a0000;
+  outline: 1px solid #ff2a2a66;
+}
+
+.map-spawned-item {
+  width: 8px;
+  height: 8px;
+  background: #b45cff;
+}
+
+.map-entrance {
+  width: 18px;
+  height: 18px;
+  -webkit-mask: var(--door-icon) center/contain no-repeat;
+  mask: var(--door-icon) center/contain no-repeat;
+  --door-icon: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M3 0h10v15h2v1H1v-1h2zM10 7v2h1.5V7z'/%3E%3C/svg%3E");
+}
+
+.map-entrance.main {
+  background: #4ade80;
+}
+
+.map-entrance.fire {
+  background: #ff5c5c;
+}
+
+.map-door {
+  width: 7px;
+  height: 7px;
+  background: #9aa59a;
+  border: 1px solid #000;
+}
+
+.map-door.locked {
+  background: #ff9f1a;
+}
+
+.map-door.unlocked {
+  background: #4ac0ff;
+}
+
+.map-code {
+  padding: 0 2px;
+  font-size: 8px;
+  line-height: 10px;
+  white-space: nowrap;
+  border-radius: 2px;
+  color: #000;
+}
+
+.map-code.hazard {
+  background: #ff5c5c;
+}
+
+.map-code.big-door {
+  background: #4ac0ff;
+}
+
+.map-floor-link {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  transform: translate(-50%, -50%) rotate(calc(var(--map-rotation, 0deg) * -1)) scale(var(--item-scale, 1));
+}
+
+.map-floor-link button {
+  width: 14px;
+  height: 11px;
+  padding: 0;
+  font-size: 8px;
+  line-height: 1;
+  background: #00000070;
+  border: 1px solid #33ff3333;
+  border-radius: 2px;
+  color: #33ff3388;
+  cursor: pointer;
+}
+
+.map-floor-link button:hover {
+  background: #000000c0;
+  border-color: var(--green);
+  color: var(--green);
+}
+
+#map-tooltip {
+  position: absolute;
+  z-index: 1;
+  padding: 6px 10px;
+  background: #020a02f0;
+  border: 2px solid var(--green-dim);
+  border-radius: 6px;
+  font-size: 15px;
+  line-height: 1.4;
+  white-space: nowrap;
+  pointer-events: none;
+}

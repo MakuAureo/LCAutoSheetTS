@@ -4,3 +4,5 @@ node_modules/
 tokens.json
 config.ts
 stats.db
+maps/
+map_tiles/

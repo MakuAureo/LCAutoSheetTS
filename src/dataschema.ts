@@ -1,17 +1,73 @@
+interface DoorInfo {
+  Position: number[];
+  StartedLocked: boolean;
+  UnlockTime: string;
+}
+
+interface BigDoorInfo {
+  Position: number[];
+  Code: string;
+  StartedOpen: boolean;
+}
+
+interface MapHazardInfo {
+  Kind: string;
+  Position: number[];
+  Code: string;
+}
+
+interface OutsideObjectInfo {
+  Name: string;
+  Position: number[];
+  Yaw: number;
+}
+
 interface MoonInfo {
   Name: string;
-  Weather: string
+  Weather: string;
+  Entrances: DungeonEntrance[];
+  OutsideObjects: OutsideObjectInfo[];
+  RemovedTrees: number[][];
+}
+
+interface DungeonEntrance {
+  Position: number[];
+  Main: boolean
+}
+
+interface DungeonTile {
+  Name: string;
+  Position: number[];
+  BoundsMin: number[];
+  BoundsMax: number[];
+  Yaw: number;
+  Overlays: string[];
+  Entrances: DungeonEntrance[]
+}
+
+interface DungeonEdge {
+  From: number[];
+  To: number[]
+}
+
+interface DungeonMap {
+  Tiles: DungeonTile[];
+  Edges: DungeonEdge[]
 }
 
 interface DungeonInfo {
   Interior: string;
-  ItemCount: number 
+  ItemCount: number;
+  DungeonMap: DungeonMap;
+  Doors: DoorInfo[];
+  BigDoors: BigDoorInfo[]
 }
 
 interface HazardInfo { 
   TurretCount: number;
   LandmineCount: number;
-  SpiketrapCount: number
+  SpiketrapCount: number;
+  MapHazards: MapHazardInfo[]
 }
 
 interface PerformanceInfo { 
@@ -50,9 +106,12 @@ interface PlayerStats {
 }
 
 interface SpawnInfo {
+  Id: number;
   Enemy: string;
   SpawnTime: string;
   TimeOfDeath: string;
+  SpawnPosition: number[];
+  EndPosition: number[] | null;
 }
 
 interface FurnitureInfo {
@@ -72,10 +131,19 @@ interface GiftBoxInfo {
 }
 
 interface MissingItemInfo {
+  Id: number;
   Value: number;
   ItemType: string;
   DespawnPosition: number[];
   CollectedOnPreviousDay: boolean;
+  ScrapInsideGiftValue: number;
+};
+
+interface SpawnedItemInfo {
+  Id: number;
+  Value: number;
+  ItemType: string;
+  SpawnPosition: number[];
   ScrapInsideGiftValue: number;
 };
 
@@ -99,5 +167,6 @@ export interface Stats {
   ShopSales: { [key: string]: number };
   FurnitureInfo: { [key: string]: FurnitureInfo };
   GiftBoxesOpened: GiftBoxInfo[];
+  SpawnedItems: SpawnedItemInfo[];
   MissedItems: MissingItemInfo[];
 }

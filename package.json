@@ -11,6 +11,7 @@
     "eventsource": "^4.1.0",
     "express": "^5.2.1",
     "googleapis": "^171.4.0",
+    "sharp": "^0.35.5",
     "type": "^2.7.3"
   },
   "devDependencies": {

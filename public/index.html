@@ -21,7 +21,7 @@
         <nav class="tab-nav">
           <label class="tab-label glow" for="tab1">[ LAST DAY ]</label>
           <label class="tab-label glow" for="tab2">[ STATS⚠️ ]</label>
-          <label class="tab-label glow" for="tab3">[ MAP⚠️ ]</label>
+          <label class="tab-label glow" for="tab3">[ MAP ]</label>
           <label class="tab-label glow" for="tab4">[ CREDITS ]</label>
         </nav>
 
@@ -76,8 +76,60 @@
           </div>
 
           <div id="panel3" class="tab-panel">
-            <div class="panel-title glow">MAP (WIP⚠️)</div>
-              <p>nothing to see here. Yet...</p>
+            <div class="panel-title glow">MAP</div>
+
+            <div id="map-layout">
+              <aside id="map-panel" class="info-box">
+                <h2 id="map-title">No map yet</h2>
+
+                <div id="map-controls" class="hide-item">
+                  <h4>Floors</h4>
+                  <div id="map-floors"></div>
+
+                  <h4>Go To</h4>
+                  <div id="map-goto">
+                    <button id="map-goto-main" class="glow" onclick="goToMainEntrance()">Main</button>
+                    <button id="map-goto-fire" class="glow" onclick="goToNextFireExit()">Fire</button>
+                  </div>
+
+                  <h4>Show</h4>
+                  <div id="map-toggles">
+                    <button class="glow selected" onclick="toggleMapMarkers(this, 'hide-missed')"><span class="swatch missed"></span>Missed</button>
+                    <button class="glow selected" onclick="toggleMapMarkers(this, 'hide-spawned')"><span class="swatch spawned"></span>Spawned</button>
+                    <button class="glow selected" onclick="toggleMapMarkers(this, 'hide-enemy-spawn')"><span class="swatch enemy-spawn"></span>Enemy Spawn</button>
+                    <button class="glow selected" onclick="toggleMapMarkers(this, 'hide-enemy-end')"><span class="swatch enemy-end"></span>Enemy End</button>
+                  </div>
+
+                  <h4>Rotation</h4>
+                  <div id="map-rotation">
+                    <button class="glow" onclick="rotateMapBy(-90)">-90&deg;</button>
+                    <span id="map-rotation-level"></span>
+                    <button class="glow" onclick="rotateMapBy(90)">+90&deg;</button>
+                  </div>
+
+                  <h4>Zoom</h4>
+                  <div id="map-zoom">
+                    <button class="glow" onclick="zoomMapBy(1 / MAP_ZOOM_STEP)">-</button>
+                    <span id="map-zoom-level"></span>
+                    <button class="glow" onclick="zoomMapBy(MAP_ZOOM_STEP)">+</button>
+                    <button class="glow" onclick="fitMap()">Fit</button>
+                  </div>
+
+                  <button id="map-download" class="glow" onclick="downloadMap()">Save All Floors</button>
+                </div>
+
+                <button id="map-upload" class="glow" onclick="document.getElementById('map-upload-file').click()">Upload JSON</button>
+                <input id="map-upload-file" class="hide-item" type="file" accept=".json,application/json" onchange="uploadMapJson(this)">
+              </aside>
+
+              <div id="map-view" class="hide-item">
+                <div id="map-stage">
+                  <img id="map-image" alt="Map of the selected floor" draggable="false">
+                  <div id="map-items"></div>
+                </div>
+                <div id="map-tooltip" class="hide-item"></div>
+              </div>
+            </div>
           </div>
 
           <div id="panel4" class="tab-panel">

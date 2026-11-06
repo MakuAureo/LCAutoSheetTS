@@ -16,3 +16,6 @@ export const FURNITURE_CELL_START     = "BE4"
 
 export const MOD_PORT    = 2145;
 export const SERVER_PORT = 8000;
+
+// Map config
+export const MAP_TILES_DIR = "map_tiles"; // Tile images and manifests from render_tiles.py, one folder per game version

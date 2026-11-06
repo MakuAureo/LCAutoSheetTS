@@ -5,6 +5,8 @@ import { exec } from "child_process";
 import { getAuthUrl, getSheetId, handleOAuthCallback, isAuthenticated, writeStatsToSheet } from "./src/autosheet.ts";
 import { MOD_PORT, SERVER_PORT } from "./src/config.ts";
 import { statsDB, writeStatsToDB } from "./src/database.ts";
+import { buildMap, getMapImage, hasMapData } from "./src/mapbuilder.ts";
+import type { MapInfo } from "./src/mapbuilder.ts";
 
 function openBrowser(url: string): void {
   exec(`xdg-open "${url}"`, (err) => {
@@ -26,10 +28,55 @@ function notifyBrowserClients(stats: unknown): void {
   }
 }
 
+// ── Map ──────────────────────────────────────────────────────
+
+type MapState = { status: "none" | "building" | "failed" } | { status: "ready"; map: MapInfo };
+
+let mapState: MapState = { status: "none" };
+
+function setMapState(state: MapState): void {
+  mapState = state;
+  const payload = `event: map\ndata: ${JSON.stringify(state)}\n\n`;
+  for (const client of browserClients) {
+    client.write(payload);
+  }
+}
+
+async function updateMap(stats: Parameters<typeof buildMap>[0]): Promise<void> {
+  setMapState({ status: "building" });
+  try {
+    setMapState({ status: "ready", map: await buildMap(stats) });
+  } catch (err) {
+    console.error("Failed to build map:", err);
+    setMapState({ status: "failed" });
+  }
+}
+
 // ── Routes ───────────────────────────────────────────────────
 
 // Serve the website
 app.use(express.static("public"));
+
+// A day's JSON saved earlier. Only replaces the map, it doesn't count as a new day for the sheet or database
+app.post("/map/upload", express.json({ limit: "50mb" }), async (req, res) => {
+  if (!req.body || !hasMapData(req.body)) {
+    res.status(400).send("This JSON has no map data.");
+    return;
+  }
+  await updateMap(req.body);
+  if (mapState.status === "ready") res.sendStatus(204);
+  else res.status(500).send("Failed to build the map from this JSON.");
+});
+
+// Floor images of the current map, they only exist in memory
+app.get("/maps/:id/:file", (req, res) => {
+  const image = getMapImage(req.params.id, req.params.file);
+  if (!image) {
+    res.status(404).send("No such map image.");
+    return;
+  }
+  res.type("png").send(image);
+});
 
 // Browser connects here to receive live stat updates
 app.get("/live", (req, res) => {
@@ -45,6 +92,7 @@ app.get("/live", (req, res) => {
   // Send last known stats immediately so the page isn't blank on connect
   if (lastStats)
     res.write(`data: ${JSON.stringify(lastStats)}\n\n`);
+  res.write(`event: map\ndata: ${JSON.stringify(mapState)}\n\n`);
 
   req.on("close", () => {
     browserClients.delete(res);
@@ -127,6 +175,10 @@ function connectToMod(): void {
     // Push to any open browser tabs immediately
     notifyBrowserClients(stats);
 
+    // Doesn't hold up the rest, browsers get told when it's done
+    if (hasMapData(stats))
+      updateMap(stats);
+
     // Write to sheets if authenticated
     if (isAuthenticated()) {
       try {
@@ -137,7 +189,7 @@ function connectToMod(): void {
     } else {
       console.warn(`Not authenticated — skipping spreadsheet write. Visit http://localhost:${SERVER_PORT}/oauth/login`);
     }
-    
+
     // Push to database
     writeStatsToDB(stats);
 
